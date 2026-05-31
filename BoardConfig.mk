@@ -71,20 +71,20 @@ BOARD_MKBOOTIMG_ARGS += \
     --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_KERNEL_IMAGE_NAME := Image
 
-# 恢复预编译内核，使用prebuilt里kernel，注释源码内核
+# 预编译内核：只用kernel，全程屏蔽dtb相关
 TARGET_FORCE_PREBUILT_KERNEL := true
 ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
-# 继续屏蔽dtb，不从外部读dtb.img
+# 永久注释dtb引入，不再寻找dtb.img
 #TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
 #BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
-#BOARD_INCLUDE_DTB_IN_BOOTIMG := false
 endif
+# 关键修复：关闭内置dtb打包，不再生成/寻找dtb.img
+BOARD_INCLUDE_DTB_IN_BOOTIMG := false
 
-# 注释源码内核路径（没有内核源码，删掉这两行）
+# 注释源码内核（无源码不能启用）
 #TARGET_KERNEL_SOURCE := kernel/5g/L39_IVVI_4_64_V80M60BP_NZW_BT30
 #TARGET_KERNEL_CONFIG := L39_IVVI_4_64_V80M60BP_NZW_BT30_defconfig
-BOARD_INCLUDE_DTB_IN_BOOTIMG := true
 
 # 分区大小
 BOARD_FLASH_BLOCK_SIZE := 131072
@@ -133,6 +133,6 @@ TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
 # 维护者
 OF_MAINTAINER := pipi
 
-# 精简编译省内存
+# 精简编译减少内存占用
 OF_NO_ADDON := true
 TW_INCLUDE_FB2PNG := false
