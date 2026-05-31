@@ -9,10 +9,10 @@
 $(call inherit-product, $(SRC_TARGET_DIR)/product/core_64_bit.mk)
 $(call inherit-product, $(SRC_TARGET_DIR)/product/full_base_telephony.mk)
 
-# Inherit from your device
-$(call inherit-product, device/5g/L39_IVVI_4_64_V80BP_NZW_BT30/device.mk)
+# 【路径已完全修正】
+$(call inherit-product, device/5g/L39_IVVI_4_64_V80M60BP_NZW_BT30/device.mk)
 
-# OrangeFox 配置（已删除 export，绝对不报错）
+# OrangeFox 配置
 OF_MAINTAINER := "pipi"
 OF_TWRP_COMPATIBILITY_MODE := 1
 OF_SUPPORT_ALL_BLOCK_OTA := 1
