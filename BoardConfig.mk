@@ -5,17 +5,12 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-DEVICE_PATH := device/5g/L39_IVVI_4_64_V80M60BP_NZW_BT30
+DEVICE_PATH := device/5g/L39_IVVI_4_64_V80BP_NZW_BT30
 
-# 编译容错
 ALLOW_MISSING_DEPENDENCIES := true
 BUILD_BROKEN_META_LICENSE := true
 
-# MTK配置
-BOARD_HAS_MTK_HARDWARE := true
-BOARD_USES_MTK_HARDWARE := true
-
-# A/B分区
+# A/B
 AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
     boot \
@@ -27,57 +22,54 @@ AB_OTA_PARTITIONS += \
 BOARD_USES_RECOVERY_AS_BOOT := true
 TARGET_NO_RECOVERY := true
 
-# CPU架构
+# Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
-TARGET_CPU_ABI2 :=
-TARGET_CPU_VARIANT := generic
-TARGET_CPU_VARIANT_RUNTIME := cortex-a53
+TARGET_CPU_VARIANT := cortex-a53
 
 TARGET_2ND_ARCH := arm
 TARGET_2ND_ARCH_VARIANT := armv7-a-neon
 TARGET_2ND_CPU_ABI := armeabi-v7a
-TARGET_2ND_CPU_ABI2 := armeabi
-TARGET_2ND_CPU_VARIANT := generic
-TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a53
+TARGET_2ND_CPU_VARIANT := cortex-a53
 
 OVERRIDE_TARGET_FLATTEN_APEX := true
 
-# 引导
+# Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := k69v1_64
 TARGET_NO_BOOTLOADER := true
 TARGET_SCREEN_DENSITY := 320
 
-# 内核基础参数
+# Kernel
 BOARD_BOOTIMG_HEADER_VERSION := 2
 BOARD_KERNEL_BASE := 0x40078000
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_RAMDISK_OFFSET := 0x07c08000
 BOARD_KERNEL_TAGS_OFFSET := 0x0bc08000
-
 BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 buildvariant=user ro.verified.status=verified
 
 BOARD_MKBOOTIMG_ARGS += \
     --header_version $(BOARD_BOOTIMG_HEADER_VERSION) \
     --ramdisk_offset $(BOARD_RAMDISK_OFFSET) \
     --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
-BOARD_KERNEL_IMAGE_NAME := Image
 
-# ==========【重点！prebuilt在仓库根目录，路径 ./prebuilt/】==========
+# ===================== 【路径 100% 正确】 =====================
 TARGET_FORCE_PREBUILT_KERNEL := true
 ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
-TARGET_PREBUILT_KERNEL := ./prebuilt/kernel
-TARGET_PREBUILT_DTB := ./prebuilt/dtb.img
-BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
-endif
-BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+# 两个文件都在 仓库根目录 /prebuilt/
+TARGET_PREBUILT_KERNEL := $(TOP)/prebuilt/kernel
+TARGET_PREBUILT_DTB    := $(TOP)/prebuilt/dtb.img
 
-# 彻底禁用源码内核编译
+BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
+BOARD_INCLUDE_DTB_IN_BOOTIMG := true
+endif
+
+# 禁止编译内核源码
 TARGET_KERNEL_SOURCE :=
 TARGET_KERNEL_CONFIG :=
+# ==============================================================
 
-# 分区配置
+# Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 33554432
@@ -92,20 +84,20 @@ BOARD_SUPER_PARTITION_GROUPS := 5g_dynamic_partitions
 BOARD_5G_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor product
 BOARD_5G_DYNAMIC_PARTITIONS_SIZE := 9122611200
 
+# Platform
 TARGET_BOARD_PLATFORM := mt6768
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
-# AVB&防回滚
-VENDOR_SECURITY_PATCH := 2021-08-01
+# AVB
 BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 PLATFORM_SECURITY_PATCH := 2099-12-31
+VENDOR_SECURITY_PATCH := 2021-08-01
 PLATFORM_VERSION := 16.1.0
 
-# TWRP/OrangeFox配置
+# TWRP / OrangeFox
 TW_THEME := portrait_hdpi
-TW_DEFAULT_LANGUAGE := zh_CN
 TW_EXTRA_LANGUAGES := true
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
@@ -113,15 +105,12 @@ TW_USE_TOOLBOX := true
 TW_INCLUDE_REPACKTOOLS := true
 TW_USE_LEGACY_BATTERY_SERVICES := true
 TW_NO_SCREEN_TIMEOUT := true
-TW_CRONTAB_ENABLE := false
 
-# 亮度参数（解决之前报错）
+# Brightness
 TW_MAX_BRIGHTNESS := 2047
 TW_DEFAULT_BRIGHTNESS := 1024
 TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
 
-# OF维护者
-OF_MAINTAINER := pipi
-# 精简编译减少内存崩溃
+# OrangeFox
+OF_MAINTAINER := xy
 OF_NO_ADDON := true
-TW_INCLUDE_FB2PNG := false
