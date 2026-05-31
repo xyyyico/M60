@@ -5,33 +5,24 @@
 # SPDX-License-Identifier: Apache-2.0
 #
 
-BUILD_BROKEN_META_LICENSE := true
 DEVICE_PATH := device/5g/L39_IVVI_4_64_V80M60BP_NZW_BT30
 
-# 编译容错配置
 ALLOW_MISSING_DEPENDENCIES := true
-BUILD_BROKEN_DUP_RULES := true
-BUILD_BROKEN_ELF_PREBUILT_PRODUCT_INCLUDES := true
-BUILD_BROKEN_PREBUILT_ELF_FILES := true
-BUILD_BROKEN_VINTF_PRODUCT_COPY_FILES := true
+BUILD_BROKEN_META_LICENSE := true
 
-# MTK平台
-BOARD_HAS_MTK_HARDWARE := true
-BOARD_USES_MTK_HARDWARE := true
-
-# A/B分区
+# A/B
 AB_OTA_UPDATER := true
 AB_OTA_PARTITIONS += \
-    boot \
     system \
-    vendor \
     product \
+    vendor \
     vbmeta_system \
-    vbmeta_vendor
+    vbmeta_vendor \
+    boot
 BOARD_USES_RECOVERY_AS_BOOT := true
 TARGET_NO_RECOVERY := true
 
-# CPU架构
+# Architecture
 TARGET_ARCH := arm64
 TARGET_ARCH_VARIANT := armv8-a
 TARGET_CPU_ABI := arm64-v8a
@@ -46,47 +37,47 @@ TARGET_2ND_CPU_ABI2 := armeabi
 TARGET_2ND_CPU_VARIANT := generic
 TARGET_2ND_CPU_VARIANT_RUNTIME := cortex-a53
 
+# APEX
 OVERRIDE_TARGET_FLATTEN_APEX := true
 
-# 引导参数
+# Bootloader
 TARGET_BOOTLOADER_BOARD_NAME := k69v1_64
 TARGET_NO_BOOTLOADER := true
+
+# Display
 TARGET_SCREEN_DENSITY := 320
 
-# 内核基础参数
+# Kernel
 BOARD_BOOTIMG_HEADER_VERSION := 2
 BOARD_KERNEL_BASE := 0x40078000
+BOARD_KERNEL_CMDLINE := bootopt=64S3,32N2,64N2 buildvariant=user ro.verified.status=verified
 BOARD_KERNEL_PAGESIZE := 2048
 BOARD_RAMDISK_OFFSET := 0x07c08000
 BOARD_KERNEL_TAGS_OFFSET := 0x0bc08000
-
-BOARD_KERNEL_CMDLINE := \
-    bootopt=64S3,32N2,64N2 \
-    buildvariant=user \
-    ro.verified.status=verified
-
-BOARD_MKBOOTIMG_ARGS += \
-    --header_version $(BOARD_BOOTIMG_HEADER_VERSION) \
-    --ramdisk_offset $(BOARD_RAMDISK_OFFSET) \
-    --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --header_version $(BOARD_BOOTIMG_HEADER_VERSION)
+BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
+BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_KERNEL_IMAGE_NAME := Image
 
-# 预编译内核：只用kernel，全程屏蔽dtb相关
+# ==============================================
+# 【关键：只使用预编译内核，彻底关闭 DTB 依赖】
+# ==============================================
 TARGET_FORCE_PREBUILT_KERNEL := true
 ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
-# 永久注释dtb引入，不再寻找dtb.img
-#TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
-#BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
+# TARGET_PREBUILT_DTB 全部注释，不使用
+# TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
+# BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
 endif
-# 关键修复：关闭内置dtb打包，不再生成/寻找dtb.img
+
+# 关闭外置 DTB，内核自带内置DTB，足够开机
 BOARD_INCLUDE_DTB_IN_BOOTIMG := false
 
-# 注释源码内核（无源码不能启用）
-#TARGET_KERNEL_SOURCE := kernel/5g/L39_IVVI_4_64_V80M60BP_NZW_BT30
-#TARGET_KERNEL_CONFIG := L39_IVVI_4_64_V80M60BP_NZW_BT30_defconfig
+# 关闭源码编译内核（你没有内核源码，必须注释）
+# TARGET_KERNEL_CONFIG := L39_IVVI_4_64_V80M60BP_NZW_BT30_defconfig
+# TARGET_KERNEL_SOURCE := kernel/5g/L39_IVVI_4_64_V80M60BP_NZW_BT30
 
-# 分区大小
+# Partitions
 BOARD_FLASH_BLOCK_SIZE := 131072
 BOARD_BOOTIMAGE_PARTITION_SIZE := 33554432
 BOARD_RECOVERYIMAGE_PARTITION_SIZE := 33554432
@@ -96,26 +87,27 @@ BOARD_USERDATAIMAGE_FILE_SYSTEM_TYPE := ext4
 BOARD_VENDORIMAGE_FILE_SYSTEM_TYPE := ext4
 TARGET_COPY_OUT_VENDOR := vendor
 
-# 动态super分区
 BOARD_SUPER_PARTITION_SIZE := 9126805504
 BOARD_SUPER_PARTITION_GROUPS := 5g_dynamic_partitions
 BOARD_5G_DYNAMIC_PARTITIONS_PARTITION_LIST := system vendor product
 BOARD_5G_DYNAMIC_PARTITIONS_SIZE := 9122611200
 
+# Platform
 TARGET_BOARD_PLATFORM := mt6768
+
+# Recovery
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
-# AVB防回滚
-VENDOR_SECURITY_PATCH := 2021-08-01
+# AVB & Security
 BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 PLATFORM_SECURITY_PATCH := 2099-12-31
+VENDOR_SECURITY_PATCH := 2021-08-01
 PLATFORM_VERSION := 16.1.0
 
-# TWRP/OrangeFox配置
+# TWRP / OrangeFox
 TW_THEME := portrait_hdpi
-TW_DEFAULT_LANGUAGE := zh_CN
 TW_EXTRA_LANGUAGES := true
 TW_SCREEN_BLANK_ON_BOOT := true
 TW_INPUT_BLACKLIST := "hbtp_vm"
@@ -123,16 +115,7 @@ TW_USE_TOOLBOX := true
 TW_INCLUDE_REPACKTOOLS := true
 TW_USE_LEGACY_BATTERY_SERVICES := true
 TW_NO_SCREEN_TIMEOUT := true
-TW_CRONTAB_ENABLE := false
 
-# 屏幕亮度
-TW_MAX_BRIGHTNESS := 2047
-TW_DEFAULT_BRIGHTNESS := 1024
-TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
-
-# 维护者
-OF_MAINTAINER := pipi
-
-# 精简编译减少内存占用
+# 精简编译，不占内存
 OF_NO_ADDON := true
-TW_INCLUDE_FB2PNG := false
+OF_MAINTAINER := pipi
