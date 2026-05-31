@@ -59,21 +59,16 @@ BOARD_MKBOOTIMG_ARGS += --ramdisk_offset $(BOARD_RAMDISK_OFFSET)
 BOARD_MKBOOTIMG_ARGS += --tags_offset $(BOARD_KERNEL_TAGS_OFFSET)
 BOARD_KERNEL_IMAGE_NAME := Image
 
-# ==============================================
-# 【关键：只使用预编译内核，彻底关闭 DTB 依赖】
-# ==============================================
+# 预编译内核（无DTB，不报错）
 TARGET_FORCE_PREBUILT_KERNEL := true
 ifeq ($(TARGET_FORCE_PREBUILT_KERNEL),true)
 TARGET_PREBUILT_KERNEL := $(DEVICE_PATH)/prebuilt/kernel
-# TARGET_PREBUILT_DTB 全部注释，不使用
-# TARGET_PREBUILT_DTB := $(DEVICE_PATH)/prebuilt/dtb.img
-# BOARD_MKBOOTIMG_ARGS += --dtb $(TARGET_PREBUILT_DTB)
 endif
 
-# 关闭外置 DTB，内核自带内置DTB，足够开机
+# 彻底关闭 DTB 依赖
 BOARD_INCLUDE_DTB_IN_BOOTIMG := false
 
-# 关闭源码编译内核（你没有内核源码，必须注释）
+# 关闭源码内核（无源码）
 # TARGET_KERNEL_CONFIG := L39_IVVI_4_64_V80M60BP_NZW_BT30_defconfig
 # TARGET_KERNEL_SOURCE := kernel/5g/L39_IVVI_4_64_V80M60BP_NZW_BT30
 
@@ -99,14 +94,16 @@ TARGET_BOARD_PLATFORM := mt6768
 TARGET_USERIMAGES_USE_EXT4 := true
 TARGET_USERIMAGES_USE_F2FS := true
 
-# AVB & Security
+# AVB
 BOARD_AVB_ENABLE := true
 BOARD_AVB_MAKE_VBMETA_IMAGE_ARGS += --flags 3
 PLATFORM_SECURITY_PATCH := 2099-12-31
 VENDOR_SECURITY_PATCH := 2021-08-01
 PLATFORM_VERSION := 16.1.0
 
-# TWRP / OrangeFox
+# ========================================================================
+# 【✅ 全部补全：亮度参数 → 解决最后报错】
+# ========================================================================
 TW_THEME := portrait_hdpi
 TW_EXTRA_LANGUAGES := true
 TW_SCREEN_BLANK_ON_BOOT := true
@@ -116,6 +113,11 @@ TW_INCLUDE_REPACKTOOLS := true
 TW_USE_LEGACY_BATTERY_SERVICES := true
 TW_NO_SCREEN_TIMEOUT := true
 
-# 精简编译，不占内存
+# 必加：屏幕亮度（解决你现在的报错！）
+TW_MAX_BRIGHTNESS := 2047
+TW_DEFAULT_BRIGHTNESS := 1024
+TW_BRIGHTNESS_PATH := /sys/class/leds/lcd-backlight/brightness
+
+# OrangeFox 配置
 OF_NO_ADDON := true
 OF_MAINTAINER := pipi
